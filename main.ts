@@ -4,7 +4,6 @@
 // Split validators into committees
 // Select randomly committees to attest for each slot
 // Compare
-
 /**
  * Each block is 12 seconds
  * 12*5 - 5 blocks per minute
@@ -17,9 +16,9 @@ function drawBall(redBalls, blackBalls) {
 }
 function simulation(rounds) {
   // Accumulating array to represent how often the attack of length (index + 1) occurred
-  let length = [0,0,0,0,0,0,0];
+  let length = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
   // Loop over how many epochs should be generated
-  [...(new Array(rounds))].forEach((_, index) => {
+  [...(new Array(rounds))].forEach((_) => {
     // Initial set up up of validator distribution
     let redBalls = 96000;
     let blackBalls = 224000;
@@ -29,14 +28,18 @@ function simulation(rounds) {
     [...(new Array(32))].forEach((_, ind) => {
       let drawnRedBalls = 0;
       let isBlockCreatorRed = false;
+      if (drawBall(redBalls, blackBalls) === 1) {
+        // The first validator to be drawn is the block creator
+        isBlockCreatorRed = true;
+        drawnRedBalls++;
+        redBalls--;
+      } else {
+        blackBalls--;
+      }
       // Select 1/32 from the total number of validators (redBalls+blackBalls)/32
-      for (let i = 0; i < 10000; i++) {
-        // If the ball is red (drawBall === 1) iff the ball is red
+      for (let i = 0; i < 10000-1; i++) {
+        // Whether the ball is red | (drawBall === 1) iff the ball is red
         if (drawBall(redBalls, blackBalls) === 1) {
-          // The first validator to be drawn is the block creator
-          if (i === 0) {
-            isBlockCreatorRed = true;
-          }
           drawnRedBalls++;
           redBalls--;
         } else {
@@ -51,7 +54,7 @@ function simulation(rounds) {
     })
 
     // All slots are drawn
-    const localLength = [0, 0, 0, 0, 0, 0]
+    const localLength = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
     epoch.forEach((slot, index) => {
       if(slot.isOwnedByRed){
         //reorg 1:
@@ -103,11 +106,11 @@ function simulation(rounds) {
 /*
 * After fix
 */
-simulationAfterFix(5*60*24);
+//simulationAfterFix(5*60*24);
 
 function simulationAfterFix(rounds) {
   // Accumulating array to represent how often the attack of length (index + 1) occurred
-  let length = [0,0,0,0,0,0,0];
+  let length = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
   // Loop over how many epochs should be generated
   [...(new Array(rounds))].forEach((_, index) => {
     // Initial set up up of validator distribution
@@ -119,20 +122,31 @@ function simulationAfterFix(rounds) {
     [...(new Array(32))].forEach((_, ind) => {
       let drawnRedBalls = 0;
       let isBlockCreatorRed = false;
+
+      if (drawBall(redBalls, blackBalls) === 1) {
+        // The first validator to be drawn is the block creator
+        isBlockCreatorRed = true;
+        drawnRedBalls++;
+        redBalls--;
+      } else {
+        blackBalls--;
+      }
+      if (drawBall(redBalls, blackBalls) === 1) {
+        // The first validator to be drawn is the block creator
+        drawnRedBalls++;
+        redBalls--;
+      } else {
+        isBlockCreatorRed = false;
+        blackBalls--;
+      }
       // Select 1/32 from the total number of validators (redBalls+blackBalls)/32
       for (let i = 0; i < 10000; i++) {
         // If the ball is red (drawBall === 1) iff the ball is red
         if (drawBall(redBalls, blackBalls) === 1) {
           // The first validator to be drawn is the block creator
-          if (i === 0) {
-            isBlockCreatorRed = true;
-          }
           drawnRedBalls++;
           redBalls--;
         } else {
-          if (i === 1) {
-            isBlockCreatorRed = false;
-          }
           blackBalls--;
         }
       }
@@ -144,7 +158,7 @@ function simulationAfterFix(rounds) {
     })
 
     // All slots are drawn
-    const localLength = [0, 0, 0, 0, 0, 0]
+    const localLength = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
     epoch.forEach((slot, index) => {
       if(slot.isOwnedByRed){
         //reorg 1:
