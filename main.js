@@ -1,3 +1,27 @@
+
+const cluster = require ('cluster')
+const fs = require('fs')
+
+if (cluster.isMaster) {
+  console.log('starting master')
+  const spawnWorker = function () {
+    let worker = cluster.fork();
+    return worker
+  }
+
+  exports.spawn = function (cnt) {
+    for (let i = 0; i < cnt; i++) {
+      console.log('spawning worker.....')
+      spawnWorker()
+      console.log('worker spawned')
+    }
+  }
+}
+else {
+  const result = simulation(1000);
+  fs.appendFile('./logs/text.txt', result.toString()+ '\n', (err) => {
+    console.log(err);})
+}
 /*
 * Before fix
 */
@@ -10,7 +34,7 @@
  * 12*5*60 - 5*60 blocks per hour
  * 12*5*60*24 - 5*60*24 blocks per day
  * */
-simulation(5*60*24);
+//simulation(2500);
 function drawBall(redBalls, blackBalls) {
   return Math.random() <= redBalls/(redBalls+blackBalls) ? 1 : 0;
 }
@@ -97,8 +121,9 @@ function simulation(rounds) {
       }
     })
   });
-  console.log(length)
-  return length.map(x => x/rounds);
+  //console.log(length)
+  //return length.map(x => x/rounds);
+  return length;
 }
 
 
